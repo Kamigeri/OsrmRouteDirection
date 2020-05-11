@@ -56,7 +56,10 @@ namespace OsrmRouteDirection.ViewModels
         }
 
         public static Map map;
+        public MapSpan mapSpan;
+
         public Command GetRouteCommand { get; }
+
         private OSRMRouteService services;
         private DirectionResponse dr;
 
@@ -100,11 +103,21 @@ namespace OsrmRouteDirection.ViewModels
                 //convert the route distance in Km
                 RouteDistance = Math.Round((double)routes[0].Distance / 1000, 1);
                 Fare = Math.Round((double)RouteDistance * 1.25, 2);
-
                 if (Fare <= 6) { Fare = 6; }
-
+                await GetDestinationPosition(destination);
                 ShowRouteDetails = true;
                 IsBusy = false;
+            }
+        }
+
+        public async Task GetDestinationPosition(string destination)
+        {
+            LatLong latLong = await services.GetPositionResponseAsync(destination);
+            if (latLong != null)
+            {
+                Position position = new Position(latLong.Lat,latLong.Lng);
+                mapSpan = new MapSpan(position, 0.1, 0.1);
+                map.MoveToRegion(mapSpan);
             }
         }
     }

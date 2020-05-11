@@ -40,7 +40,7 @@ namespace OsrmRouteDirection
                     map.MoveToRegion(mapSpan);
                     await GetLocationName(p);
                     Console.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
-                    
+
                 }
             }
             catch (FeatureNotSupportedException fnsEx)

@@ -49,5 +49,24 @@ namespace OsrmRouteDirection.Services
             }
             return null;
         }
+
+        public async Task<LatLong> GetPositionResponseAsync(string position)
+        {
+            var locations = await Geocoding.GetLocationsAsync(position);
+            var location =locations?.FirstOrDefault();
+            LatLong latLong = new LatLong();
+
+
+            if (location != null)
+            {
+                latLong.Lat = location.Latitude;
+                latLong.Lng = location.Longitude;
+                return latLong;
+            }
+            else 
+            { 
+                return null;
+            }
+        }
     }
 }
