@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Xamarin.Forms.Maps;
 using Xamarin.Forms;
 using System.Linq;
+using Xamarin.Essentials;
+using System.Diagnostics;
 
 namespace OsrmRouteDirection.ViewModels
 {
@@ -48,15 +50,16 @@ namespace OsrmRouteDirection.ViewModels
             set { _fare = value; OnPropertyChanged(); }
         }
 
-        bool  _showRouteDetails;
+        bool _showRouteDetails;
         public bool ShowRouteDetails
         {
             get { return _showRouteDetails; }
             set { _showRouteDetails = value; OnPropertyChanged(); }
         }
 
-        public static Map map;
+        public static Xamarin.Forms.Maps.Map map;
         public MapSpan mapSpan;
+        public Pin pin;
 
         public Command GetRouteCommand { get; }
 
@@ -66,7 +69,7 @@ namespace OsrmRouteDirection.ViewModels
         public RouteViewModel()
         {
             ShowRouteDetails = false;
-            map = new Map();
+            map = new Xamarin.Forms.Maps.Map();
             services = new OSRMRouteService();
             dr = new DirectionResponse();
             GetRouteCommand = new Command(async () => await loadRouteAsync(Origin, Destination));
@@ -115,10 +118,36 @@ namespace OsrmRouteDirection.ViewModels
             LatLong latLong = await services.GetPositionResponseAsync(destination);
             if (latLong != null)
             {
-                Position position = new Position(latLong.Lat,latLong.Lng);
+                Position position = new Position(latLong.Lat, latLong.Lng);
+                pin = new Pin
+                {
+                    Label = await GetLocationName(position),
+                    Position = position
+                };
+                map.Pins.Add(pin);
                 mapSpan = new MapSpan(position, 0.1, 0.1);
                 map.MoveToRegion(mapSpan);
             }
+        }
+
+        public async Task<string> GetLocationName(Position position)
+        {
+            string strLocationName = string.Empty;
+            try
+            {
+                var placemarks = await Geocoding.GetPlacemarksAsync(position.Latitude, position.Longitude);
+                var placemark = placemarks?.FirstOrDefault();
+                if (placemark != null)
+                {
+                    strLocationName = String.Format($"{placemark.Thoroughfare},{placemark.SubThoroughfare}, {placemark.SubAdminArea},{placemark.AdminArea},{placemark.Locality}");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+            return strLocationName;
         }
     }
 }
