@@ -24,7 +24,7 @@ namespace OsrmRouteDirection.Services
             _httpClient = new HttpClient();
         }
 
-        public async Task<DirectionResponse> GetDirectionResponseAsync(string origin, string destination)
+        public async Task<OsrmRouteDirectionModels> GetDirectionResponseAsync(string origin, string destination)
         {
             var originLocations = await Geocoding.GetLocationsAsync(origin);
             var originLocation = originLocations?.FirstOrDefault();
@@ -36,12 +36,12 @@ namespace OsrmRouteDirection.Services
             if (originLocation != null && destinationLocation != null)
             {
                 string url = string.Format(baseRouteUrl) + $"{originLocation.Longitude},{ originLocation.Latitude};" +
-                    $"{destinationLocation.Longitude},{destinationLocation.Latitude}?overview=full&geometries=polyline&steps=false";
+                    $"{destinationLocation.Longitude},{destinationLocation.Latitude}?overview=full&geometries=polyline&steps=true";
                 var response = await _httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<DirectionResponse>(json);
+                    var result = JsonConvert.DeserializeObject<OsrmRouteDirectionModels>(json);
                     return result;
                 }
             }

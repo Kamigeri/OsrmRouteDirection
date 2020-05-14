@@ -64,14 +64,14 @@ namespace OsrmRouteDirection.ViewModels
         public Command GetRouteCommand { get; }
 
         private OSRMRouteService services;
-        private DirectionResponse dr;
+        private OsrmRouteDirectionModels dr;
 
         public RouteViewModel()
         {
             ShowRouteDetails = false;
             map = new Xamarin.Forms.Maps.Map();
             services = new OSRMRouteService();
-            dr = new DirectionResponse();
+            dr = new OsrmRouteDirectionModels();
             GetRouteCommand = new Command(async () => await loadRouteAsync(Origin, Destination));
         }
 
