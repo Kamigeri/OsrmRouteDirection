@@ -41,7 +41,7 @@ namespace OsrmRouteDirection.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<OsrmRouteDirectionModels>(json);
+                    var result = OsrmRouteDirectionModels.FromJson(json);
                     return result;
                 }
             }
